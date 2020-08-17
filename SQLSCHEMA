@@ -1,0 +1,997 @@
+CREATE TABLE Student
+(
+    student_id INT NOT NULL,
+    first_name VARCHAR NOT NULL,
+    last_name VARCHAR NOT NULL,
+    middle_name VARCHAR,
+    ssn VARCHAR NOT NULL,
+    residency VARCHAR NOT NULL,
+    enrolled VARCHAR NOT NULL,
+    PRIMARY KEY (student_id)
+);
+
+CREATE TABLE prev_school_degree
+(
+    prev_degree_id VARCHAR NOT NULL,
+    school_name VARCHAR NOT NULL,
+    degree_type VARCHAR NOT NULL,
+    degree_field VARCHAR NOT NULL,
+    PRIMARY KEY (prev_degree_id)
+);
+
+CREATE TABLE Undergraduate
+(
+    undergraduate_id INT NOT NULL,
+    college_name VARCHAR NOT NULL,
+    student_id INT NOT NULL,
+    PRIMARY KEY (undergraduate_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id)
+);
+
+CREATE TABLE Degree_system
+(
+    degree_id VARCHAR NOT NULL,
+    total_units INT NOT NULL,
+    degree_name VARCHAR NOT NULL,
+    degree_type VARCHAR NOT NULL,
+    PRIMARY KEY (degree_id)
+);
+
+CREATE TABLE Upper_division
+(
+    upper_id SERIAL NOT NULL,
+    upper_units INT NOT NULL,
+    upper_gpa FLOAT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (upper_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Technical_elective
+(
+    te_id SERIAL NOT NULL,
+    te_units INT NOT NULL,
+    te_gpa FLOAT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (te_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+
+CREATE TABLE Lower_division
+(
+    lower_id SERIAL NOT NULL,
+    lower_units INT NOT NULL,
+    lower_gpa FLOAT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (lower_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Minimum_gpa
+(
+    mini_id SERIAL NOT NULL,
+    gpa FLOAT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (mini_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Quarter
+(
+    quarter_id INT NOT NULL,
+    quarter_year INT NOT NULL,
+    quarter_type VARCHAR NOT NULL,
+    PRIMARY KEY (quarter_id)
+);
+
+CREATE TABLE Courses
+(
+    course_name VARCHAR NOT NULL,
+    course_title VARCHAR NOT NULL,
+    course_units VARCHAR NOT NULL,
+    grade_option VARCHAR NOT NULL,
+    is_te VARCHAR NOT NULL,
+    next_time_offer VARCHAR,
+    PRIMARY KEY (course_name)
+);
+
+CREATE TABLE Lab
+(
+    lab_name VARCHAR NOT NULL,
+    lab_units INT NOT NULL,
+    grade_option VARCHAR NOT NULL,
+    PRIMARY KEY (lab_name)
+);
+
+CREATE TABLE Course_lab
+(
+    course_lab_id SERIAL NOT NULL,
+    course_name VARCHAR NOT NULL,
+    lab_name VARCHAR NOT NULL,
+    PRIMARY KEY (course_lab_id),
+    FOREIGN KEY (course_name) REFERENCES Courses(course_name),
+    FOREIGN KEY (lab_name) REFERENCES Lab(lab_name)
+);
+
+CREATE TABLE Section
+(
+    section_id VARCHAR NOT NULL,
+    enroll_number INT,
+    PRIMARY KEY (section_id)
+);
+
+CREATE TABLE Weekly_section
+(
+    weekly_session_id SERIAL NOT NULL,
+    session_type VARCHAR NOT NULL,
+    session_date VARCHAR NOT NULL,
+    start_time INT NOT NULL,
+    session_place VARCHAR NOT NULL,
+    mandatory VARCHAR NOT NULL,
+    section_id VARCHAR NOT NULL,
+    PRIMARY KEY (weekly_session_id, section_id),
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
+);
+
+CREATE TABLE Review_section
+(
+    review_session_id SERIAL NOT NULL,
+    review_session_date VARCHAR NOT NULL,
+    start_time INT NOT NULL,
+    session_place VARCHAR NOT NULL,
+    section_id VARCHAR NOT NULL,
+    PRIMARY KEY (review_session_id, section_id),
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
+);
+
+CREATE TABLE Faculty
+(
+    name VARCHAR NOT NULL,
+    title VARCHAR NOT NULL,
+    PRIMARY KEY (name)
+);
+
+CREATE TABLE Department
+(
+    department_id INT NOT NULL,
+    department_name VARCHAR NOT NULL,
+    PRIMARY KEY (department_id)
+);
+
+CREATE TABLE Department_degree
+(
+    department_degree_id SERIAL NOT NULL,
+    department_id INT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (department_degree_id),
+    FOREIGN KEY (department_id) REFERENCES Department(department_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Department_faculty
+(
+    department_faculty_id SERIAL NOT NULL,
+    name VARCHAR NOT NULL,
+    department_id INT NOT NULL,
+    PRIMARY KEY (department_faculty_id),
+    FOREIGN KEY (name) REFERENCES Faculty(name),
+    FOREIGN KEY (department_id) REFERENCES Department(department_id)
+);
+
+CREATE TABLE Department_course
+(
+    department_course_id SERIAL NOT NULL,
+    course_name VARCHAR NOT NULL,
+    department_id INT NOT NULL,
+    PRIMARY KEY (department_course_id),
+    FOREIGN KEY (course_name) REFERENCES Courses(course_name),
+    FOREIGN KEY (department_id) REFERENCES Department(department_id)
+);
+
+CREATE TABLE Faculty_section
+(
+    faculty_section_id SERIAL NOT NULL,
+    name VARCHAR NOT NULL,
+    section_id VARCHAR NOT NULL,
+    PRIMARY KEY (faculty_section_id),
+    FOREIGN KEY (name) REFERENCES Faculty(name),
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
+);
+
+CREATE TABLE Prerequisites
+(
+    prerequisites_id SERIAL NOT NULL,
+    prerequisites_class_name VARCHAR NOT NULL,
+    course_name VARCHAR NOT NULL,
+    PRIMARY KEY (prerequisites_id),
+    FOREIGN KEY (course_name) REFERENCES Courses(course_name)
+);
+
+CREATE TABLE School_degree
+(
+    school_degree_id SERIAL NOT NULL,
+    student_id INT NOT NULL,
+    prev_degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (school_degree_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (prev_degree_id) REFERENCES prev_school_degree(prev_degree_id)
+);
+
+CREATE TABLE Minor
+(
+    minor_id SERIAL NOT NULL,
+    undergraduate_id INT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (minor_id),
+    FOREIGN KEY (undergraduate_id) REFERENCES Undergraduate(undergraduate_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Major
+(
+    major_id SERIAL NOT NULL,
+    undergraduate_id INT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    PRIMARY KEY (major_id),
+    FOREIGN KEY (undergraduate_id) REFERENCES Undergraduate(undergraduate_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE Concentration
+(
+    concentration_id varchar NOT NULL,
+    gpa_require FLOAT NOT NULL,
+    degree_id VARCHAR NOT NULL,
+    concentrate_course_name VARCHAR NOT NULL,
+    min_unit INT NOT NULL,
+    PRIMARY KEY (concentration_id),
+    FOREIGN KEY (degree_id) REFERENCES Degree_system(degree_id)
+);
+
+CREATE TABLE period_attendance
+(
+    attendance_id SERIAL NOT NULL,
+    student_id INT NOT NULL,
+    quarter_id INT NOT NULL,
+    PRIMARY KEY (attendance_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (quarter_id) REFERENCES Quarter(quarter_id)
+);
+
+CREATE TABLE period_probation
+(
+    probation_id SERIAL NOT NULL,
+    reason VARCHAR NOT NULL,
+    student_id INT NOT NULL,
+    quarter_id INT NOT NULL,
+    PRIMARY KEY (probation_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (quarter_id) REFERENCES Quarter(quarter_id)
+);
+
+
+CREATE TABLE Quarter_courses
+(
+    quarter_course_id SERIAL NOT NULL,
+    quarter_id INT NOT NULL,
+    course_name VARCHAR NOT NULL,
+    section_id VARCHAR NOT NULL UNIQUE,
+    PRIMARY KEY (quarter_course_id),
+    FOREIGN KEY (quarter_id) REFERENCES Quarter(quarter_id),
+    FOREIGN KEY (course_name) REFERENCES Courses(course_name),
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
+);
+
+CREATE TABLE Enrollment
+(
+    enroll_id SERIAL NOT NULL,
+    student_id INT NOT NULL,
+    section_id VARCHAR NOT NULL,
+    status VARCHAR NOT NULL,
+    grade_option VARCHAR NOT NULL,
+    unit VARCHAR NOT NULL,
+    PRIMARY KEY (enroll_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (section_id) REFERENCES Section(section_id)
+);
+
+CREATE TABLE Thesis_committee
+(
+    thesis_committee_id INT NOT NULL,
+    thesis_committee_type VARCHAR NOT NULL,
+    name_professor1 VARCHAR NOT NULL,
+    department_professor1 INT NOT NULL,
+    name_professor2 VARCHAR NOT NULL,
+    department_professor2 INT NOT NULL,
+    name_professor3 VARCHAR NOT NULL,
+    department_professor3 INT NOT NULL,
+    name_professor4 VARCHAR NOT NULL,
+    department_professor4 INT NOT NULL,
+
+    PRIMARY KEY (thesis_committee_id),
+    FOREIGN KEY (name_professor1) REFERENCES Faculty(name),
+    FOREIGN KEY (department_professor1) REFERENCES Department(department_id),
+    FOREIGN KEY (name_professor2) REFERENCES Faculty(name),
+    FOREIGN KEY (department_professor2) REFERENCES Department(department_id),
+    FOREIGN KEY (name_professor3) REFERENCES Faculty(name),
+    FOREIGN KEY (department_professor3) REFERENCES Department(department_id),
+    FOREIGN KEY (name_professor4) REFERENCES Faculty(name),
+    FOREIGN KEY (department_professor4) REFERENCES Department(department_id)
+);
+
+CREATE TABLE Graduate
+(
+    graduate_id INT NOT NULL,
+    student_id INT NOT NULL,
+    department_id INT NOT NULL,
+    thesis_committee_id INT NOT NULL,
+    PRIMARY KEY (graduate_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (department_id) REFERENCES Department(department_id),
+    FOREIGN KEY (thesis_committee_id) REFERENCES Thesis_committee(thesis_committee_id)
+);
+
+CREATE TABLE Undergrade_to_graduate
+(
+    program_id INT NOT NULL,
+    undergraduate_id INT NOT NULL,
+    graduate_id INT NOT NULL,
+    PRIMARY KEY (program_id),
+    FOREIGN KEY (undergraduate_id) REFERENCES Undergraduate(undergraduate_id),
+    FOREIGN KEY (graduate_id) REFERENCES Graduate(graduate_id)
+);
+
+CREATE TABLE passClass
+(
+    passedClassID SERIAL NOT NULL,
+    grade VARCHAR NOT NULL,
+    student_id INT NOT NULL,
+    quarter_id INT NOT NULL,
+    course_name VARCHAR NOT NULL,
+    unit INT NOT NULL,
+    grade_option VARCHAR NOT NULL,
+    PRIMARY KEY (passedClassID),
+    FOREIGN KEY (course_name) REFERENCES Courses(course_name),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (quarter_id) REFERENCES Quarter(quarter_id)
+);
+
+
+
+--undergrad
+insert into student values (1,'Benjamin','B',null,'1','CA','Y');
+insert into student values (2,'Kristen','W',null,'2','CA','Y');
+insert into student values (3,'Daniel','F',null,'3','CA','Y');
+insert into student values (4,'Claire','J',null,'4','CA','Y');
+insert into student values (5,'Julie','C',null,'5','CA','Y');
+insert into student values (6,'Kevin','L',null,'6','CA','Y');
+insert into student values (7,'Michael','B',null,'7','CA','Y');
+insert into student values (8,'Joseph','J',null,'8','CA','Y');
+insert into student values (9,'Devin','P',null,'9','CA','Y');
+insert into student values (10,'Logan','F',null,'10','CA','Y');
+insert into student values (11,'Vikram','N',null,'11','CA','Y');
+insert into student values (12,'Rachel','Z',null,'12','CA','Y');
+insert into student values (13,'Zach','M',null,'13','CA','Y');
+insert into student values (14,'Justin','H',null,'14','CA','Y');
+insert into student values (15,'Rahul','R',null,'15','CA','Y');
+--MS
+insert into student values (16,'Dave','C',null,'16','CA','Y');
+insert into student values (17,'Nelson','H',null,'17','CA','Y');
+insert into student values (18,'Andrew','P',null,'18','CA','Y');
+insert into student values (19,'Nathan','S',null,'19','CA','Y');
+insert into student values (20,'John','H',null,'20','CA','Y');
+insert into student values (21,'Anwell','W',null,'21','CA','Y');
+insert into student values (22,'Tim','K',null,'22','CA','Y');
+
+
+--course
+insert into courses values ('CSE8A','Introduction to Computer Science: Java','4','ALL','N');
+insert into courses values ('CSE105','Intro to Theory','4','ALL','Y');
+insert into courses values ('CSE123','Computer Networks','4','ALL','Y');
+insert into courses values ('CSE250A','Probabilistic Reasoning','4','ALL','Y');
+insert into courses values ('CSE250B','Machine Learning','4','ALL','N');
+insert into courses values ('CSE255','Data Mining and Predictive Analytics','4','ALL','N');
+insert into courses values ('CSE232A','Databases','4','ALL','N');
+insert into courses values ('CSE221','Operating Systems','4','ALL','Y');
+
+insert into courses values ('MAE3','Introduction to Engineering Graphics and Design','4','ALL','Y');
+insert into courses values ('MAE107','Computational Methods','4','ALL','Y');
+insert into courses values ('MAE108','Probability and Statistics','4','ALL','N');
+
+insert into courses values ('PHIL10','Intro to Logic','4','ALL','N');
+insert into courses values ('PHIL12','Scientific Reasoning','4','ALL','N');
+insert into courses values ('PHIL165','Freedom, Equality, and the Law','4','ALL','N');
+insert into courses values ('PHIL167','Contemporary Political Phil','4','ALL','N');
+
+--quarter
+insert into quarter values (201701,2017,'SPRING');
+insert into quarter values (201703,2017,'FALL');
+insert into quarter values (201704,2017,'WINTER');
+insert into quarter values (201804,2018,'WINTER');
+insert into quarter values (202001,2020,'SPRING');
+insert into quarter values (202003,2020,'FALL');
+insert into quarter values (202004,2020,'WINTER');
+insert into quarter values (202101,2021,'SPRING');
+insert into quarter values (202103,2021,'FALL');
+insert into quarter values (202104,2021,'WINTER');
+insert into quarter (quarter_id, quarter_year, quarter_type) VALUES (201801,2018,'SPRING');
+insert into quarter (quarter_id, quarter_year, quarter_type) VALUES (201803,2018,'FALL');
+
+insert into section values ('1',2);
+insert into section values ('2',5);
+insert into section values ('3',5);
+insert into section values ('4',2);
+insert into section values ('5',3);
+insert into section values ('6',3);
+insert into section values ('7',3);
+insert into section values ('8',1);
+insert into section values ('9',2);
+insert into section values ('10',5);
+insert into section(section_id, enroll_number) VALUES ('201703CSE8A404',150);
+insert into section(section_id, enroll_number) VALUES ('201704CSE8A404',150);
+insert into section(section_id, enroll_number) VALUES ('201804CSE8A404',150);
+insert into section(section_id, enroll_number) VALUES ('202101CSE8A404',150);
+insert into section(section_id, enroll_number) VALUES ('201701CSE105404',150);
+insert into section(section_id, enroll_number) VALUES ('202003CSE105404',150);
+insert into section(section_id, enroll_number) VALUES ('201704CSE250A404',150);
+insert into section(section_id, enroll_number) VALUES ('201804CSE250A404',150);
+insert into section(section_id, enroll_number) VALUES ('202104CSE250A404',150);
+insert into section (section_id, enroll_number) VALUES ('201701CSE250B404',150);
+insert into section (section_id, enroll_number) VALUES ('202103CSE250B404',150);
+insert into section (section_id, enroll_number) VALUES ('201804CSE255404',150);
+insert into section (section_id, enroll_number) VALUES ('202104CSE255404',150);
+insert into section (section_id, enroll_number) VALUES ('201804CSE232A404',150);
+insert into section (section_id, enroll_number) VALUES ('202101CSE232A404',150);
+insert into section (section_id, enroll_number) VALUES ('201703CSE221404',150);
+insert into section (section_id, enroll_number) VALUES ('202003CSE221404',150);
+insert into section (section_id, enroll_number) VALUES ('201703MAE107404',150);
+insert into section (section_id, enroll_number) VALUES ('202101MAE107404',150);
+insert into section (section_id, enroll_number) VALUES ('201701MAE108404',150);
+insert into section (section_id, enroll_number) VALUES ('201704MAE108404',150);
+insert into section (section_id, enroll_number) VALUES ('202003MAE108404',150);
+insert into section (section_id, enroll_number) VALUES ('201804PHIL10404',150);
+insert into section (section_id, enroll_number) VALUES ('202104PHIL10404',150);
+insert into section (section_id, enroll_number) VALUES ('202101PHIL12404',150);
+insert into section(section_id, enroll_number) VALUES ('201703PHIL165404',150);
+insert into section(section_id, enroll_number) VALUES ('201804PHIL165404',150);
+insert into section(section_id, enroll_number) VALUES ('202101PHIL165404',150);
+
+
+--quarter-course
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'MAE108','1');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE221','2');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE255','3');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'PHIL12','4');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE221','5');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE105','6');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'PHIL165','7');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'MAE108','8');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE221','9');
+INSERT INTO quarter_courses (quarter_id, course_name, section_id)values (202001,'CSE8A','10');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201704,'CSE8A','201704CSE8A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201703,'CSE8A','201703CSE8A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'CSE8A','201804CSE8A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202101,'CSE8A','202101CSE8A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201701,'CSE105','201701CSE105404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202003,'CSE105','202003CSE105404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201704,'CSE250A','201704CSE250A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'CSE250A','201804CSE250A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202104,'CSE250A','202104CSE250A404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201701,'CSE250B','201701CSE250B404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202103,'CSE250B','202103CSE250B404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'CSE255','201804CSE255404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202104,'CSE255','202104CSE255404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'CSE232A','201804CSE232A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202101,'CSE232A','202101CSE232A404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201703,'CSE221','201703CSE221404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202003,'CSE221','202003CSE221404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201703,'MAE107','201703MAE107404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202101,'MAE107','202101MAE107404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201704,'MAE108','201704MAE108404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202003,'MAE108','202003MAE108404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201701,'MAE108','201701MAE108404');
+
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'PHIL10','201804PHIL10404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202104,'PHIL10','202104PHIL10404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202101,'PHIL12','202101PHIL12404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201703,'PHIL165','201703PHIL165404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (201804,'PHIL165','201804PHIL165404');
+insert into quarter_courses (quarter_id, course_name, section_id) VALUES (202101,'PHIL165','202101PHIL165404');
+
+--enrollment
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (16,'2','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (17,'9','Enrolled','S/U','4');
+insert into enrollment (student_id, section_id, status, grade_option, unit) values (18,'5','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (19,'2','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (20,'9','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (21,'5','Enrolled','S/U','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (22,'3','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (16,'3','Enrolled','letter','4');
+insert into enrollment (student_id, section_id, status, grade_option, unit) values (17,'3','Enrolled','lettle','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (1,'10','Enrolled','S/U','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (5,'10','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (3,'10','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (7,'1','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (8,'1','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (9,'8','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (4,'6','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (12,'4','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (13,'7','Enrolled','S/U','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (14,'4','Enrolled','letter','4');
+INSERT INTO enrollment(student_id, section_id, status, grade_option, unit) VALUES (15,'7','Enrolled','letter','4');
+
+--passClass
+
+
+
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',1,201704,'CSE8A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B+',3,201704,'CSE8A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('C-',2,201703,'CSE8A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',4,201804,'CSE8A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B',5,201804,'CSE8A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',1,201701,'CSE105','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B+',5,201701,'CSE105','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('C',4,201701,'CSE105','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('C',16,201704,'CSE250A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B+',22,201804,'CSE250A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('D',18,201804,'CSE250A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('F',19,201804,'CSE250A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',17,201701,'CSE250B','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',19,201701,'CSE250B','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B-',20,201804,'CSE255','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B',18,201804,'CSE255','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('F',21,201804,'CSE255','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',17,201804,'CSE232A','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',22,201703,'CSE221','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',20,201703,'CSE221','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B+',10,201703,'MAE107','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B-',8,201704,'MAE108','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',7,201704,'MAE108','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B',6,201701,'MAE108','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('B+',10,201701,'MAE108','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',11,201804,'PHIL10','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A',12,201804,'PHIL10','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('C-',13,201804,'PHIL10','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('C+',14,201804,'PHIL10','letter',4);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('F',15,201703,'PHIL165','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('D',12,201703,'PHIL165','letter',2);
+insert into passclass(grade, student_id, quarter_id, course_name, grade_option,unit) VALUES ('A-',11,201804,'PHIL165','letter',2);
+
+
+
+--Faculty
+insert into faculty(name, title) VALUES ('Justin Bieber','Associate Professor');
+insert into faculty(name, title) VALUES ('Flo Rida','Professor');
+insert into faculty(name, title) VALUES ('Selena Gomez','Professor');
+insert into faculty(name, title) VALUES ('Adele','Professor');
+insert into faculty(name, title) VALUES ('Taylor Swift','Professor');
+insert into faculty(name, title) VALUES ('Kelly Clarkson','Professor');
+insert into faculty(name, title) VALUES ('Adam Levine','Professor');
+insert into faculty(name, title) VALUES ('Bjork','Professor');
+
+--
+
+--degree_system
+insert into degree_system (degree_id, total_units, degree_name, degree_type)
+values ('1',40,'B.S. in Computer Science','B.S.');
+insert into degree_system (degree_id, total_units, degree_name, degree_type)
+values ('2',35,'B.A. in Philosophy','B.A.');
+insert into degree_system (degree_id, total_units, degree_name, degree_type)
+values ('3',50,'B.S. in Mechanical Engineering','B.S.');
+insert into degree_system (degree_id, total_units, degree_name, degree_type)
+values ('4',45,'M.S. in Computer Science','M.S.');
+
+--lower_division  with lower_gpa 2.0 for all degree(as not given in the demo data)
+insert into lower_division(lower_units, lower_gpa, degree_id) VALUES (10,2.0,'1');
+insert into lower_division(lower_units, lower_gpa, degree_id) VALUES (15,2.0,'2');
+insert into lower_division(lower_units, lower_gpa, degree_id) VALUES (20,2.0,'3');
+
+--upder_division with minimum gpa 2.0
+insert into upper_division(upper_units, upper_gpa, degree_id) VALUES (15,2.0,'1');
+insert into upper_division(upper_units, upper_gpa, degree_id) VALUES (20,2.0,'2');
+insert into upper_division(upper_units, upper_gpa, degree_id) VALUES (20,2.0,'3');
+
+--techinical_elective, include only applicable degree_id
+insert into technical_elective(te_units, te_gpa, degree_id) VALUES (15,2.0,'1');
+insert into technical_elective(te_units, te_gpa, degree_id) VALUES (0, 0,'2');
+insert into technical_elective(te_units, te_gpa, degree_id) VALUES (10,2.0,'3');
+
+--concentration
+insert into concentration(concentration_id, gpa_require, degree_id, concentrate_course_name,min_unit) VALUES ('Databases',3.0,'4','CSE232A',4);
+insert into concentration(concentration_id, gpa_require, degree_id, concentrate_course_name,min_unit) VALUES ('AI',3.1,'4','CSE255,CSE250A',8);
+insert into concentration(concentration_id, gpa_require, degree_id, concentrate_course_name,min_unit) VALUES ('Systems',3.3,'4','CSE221',4);
+
+--weekly_section
+--LECTURE section
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','M,W,F',10,'PC','Y','1');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','M,W,F',10,'PC','Y','2');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','M,W,F',12,'PC','Y','3');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','M,W,F',12,'PC','Y','4');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','M,W,F',12,'PC','Y','5');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','Tue,Thu',14,'PC','Y','6');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','Tue,Thu',15,'PC','Y','7');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','Tue,Thu',15,'PC','Y','8');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','Tue,Thu',17,'PC','Y','9');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('LE','Tue,Thu',17,'PC','Y','10');
+
+--dis section
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('DI','F',18,'PC','Y','6');
+insert into weekly_section(session_type, session_date, start_time, session_place, mandatory, section_id) VALUES ('DI','W',19,'PC','Y','10');
+
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','Tue,Thu',10,'PC','Y','1');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','Tue,Thu',11,'PC','Y','2');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','W,F',13,'PC','Y','4');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','Tue,Thu',12,'PC','Y','5');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','Thu',13,'PC','Y','7');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','M',15,'PC','Y','8');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('DI','M,F',21,'PC','Y','9');
+
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('LAB','F',18,'PC','Y','1');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('LAB','F',17,'PC','Y','8');
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+VALUES ('LAB','Tue,Thu',15,'PC','Y','10');
+
+--FACULTY_SECTION(passed course included)
+
+insert into faculty_section(name, section_id) VALUES ('Justin Bieber','201704CSE8A404');
+insert into faculty_section(name, section_id) VALUES ('Flo Rida','201703PHIL165404');
+insert into faculty_section(name, section_id) VALUES ('Selena Gomez','201703CSE8A404');
+insert into faculty_section(name, section_id) VALUES ('Adele','1');
+insert into faculty_section(name, section_id) VALUES ('Taylor Swift','201701CSE105404');
+insert into faculty_section(name, section_id) VALUES ('Kelly Clarkson','201804CSE8A404');
+
+insert into faculty_section(name, section_id) VALUES ('Bjork','201704CSE250A404');
+insert into faculty_section(name, section_id) VALUES ('Bjork','201804PHIL10404');
+insert into faculty_section(name, section_id) VALUES ('Justin Bieber','201701CSE250B404');
+insert into faculty_section(name, section_id) VALUES ('Flo Rida','3');
+insert into faculty_section(name, section_id) VALUES ('Selena Gomez','8');
+insert into faculty_section(name, section_id) VALUES ('Adele','10');
+insert into faculty_section(name, section_id) VALUES ('Taylor Swift','6');
+
+
+
+insert into faculty_section(name, section_id) VALUES ('Kelly Clarkson','201804CSE232A404');
+insert into faculty_section(name, section_id) VALUES ('Adam Levine','201804PHIL165404');
+insert into faculty_section(name, section_id) VALUES ('Bjork','201703MAE107404');
+insert into faculty_section(name, section_id) VALUES ('Justin Bieber','9');
+insert into faculty_section(name, section_id) VALUES ('Selena Gomez','201704MAE108404');
+insert into faculty_section(name, section_id) VALUES ('Adam Levine','4');
+insert into faculty_section(name, section_id) VALUES ('Bjork','201804CSE250A404');
+insert into faculty_section(name, section_id) VALUES ('Adam Levine','7');
+insert into faculty_section(name, section_id) VALUES ('Kelly Clarkson','2');
+insert into faculty_section(name, section_id) VALUES ('Kelly Clarkson','5');
+insert into faculty_section(name, section_id) VALUES ('Justin Bieber','201804CSE255404');
+insert into faculty_section(name, section_id) VALUES ('Justin Bieber','201703CSE221404');
+insert into faculty_section(name, section_id) VALUES ('Selena Gomez','201701MAE108404');
+
+-- undergraduate
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (1,'warren',1);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (2,'warren',2);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (3,'warren',3);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (4,'warren',4);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (5,'warren',5);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (6,'warren',6);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (7,'warren',7);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (8,'warren',8);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (9,'warren',9);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (10,'warren',10);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (11,'warren',11);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (12,'warren',12);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (13,'warren',13);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (14,'warren',14);
+INSERT INTO Undergraduate(UNDERGRADUATE_ID, COLLEGE_NAME, STUDENT_ID) values (15,'warren',15);
+
+
+
+
+--department
+INSERT INTO department (DEPARTMENT_ID, DEPARTMENT_NAME) VALUES (1,'CSE');
+INSERT INTO department (DEPARTMENT_ID, DEPARTMENT_NAME) VALUES (2,'PHIL');
+INSERT INTO department (DEPARTMENT_ID, DEPARTMENT_NAME) VALUES (3,'MAE');
+
+
+--graduate_student, thesis_committee_id remain determine, set to 1 temporarily
+
+
+INSERT INTO Thesis_committee(thesis_committee_id, thesis_committee_type, name_professor1, department_professor1, name_professor2, department_professor2, name_professor3, department_professor3, name_professor4, department_professor4)
+VALUES(1,'M.S.','Justin Bieber',1,'Justin Bieber',1,'Justin Bieber',1,'Justin Bieber',1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (16,16,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (17,17,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (18,18,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (19,19,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (20,20,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (21,21,1,1);
+INSERT INTO graduate(graduate_id, student_id, department_id, thesis_committee_id) VALUES (22,22,1,1);
+
+
+
+--department_course
+
+INSERT INTO department_course(course_name,department_id) VALUES('CSE8A',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE105',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE123',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE250A',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE250B',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE255',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE232A',1);
+INSERT INTO department_course(course_name,department_id) VALUES('CSE221',1);
+INSERT INTO department_course(course_name,department_id) VALUES('MAE3',3);
+INSERT INTO department_course(course_name,department_id) VALUES('MAE107',3);
+INSERT INTO department_course(course_name,department_id) VALUES('MAE108',3);
+INSERT INTO department_course(course_name,department_id) VALUES('PHIL10',2);
+INSERT INTO department_course(course_name,department_id) VALUES('PHIL12',2);
+INSERT INTO department_course(course_name,department_id) VALUES('PHIL165',2);
+INSERT INTO department_course(course_name,department_id) VALUES('PHIL167',2);
+
+--department_degree
+insert into department_degree (department_id, degree_id) VALUES (1,'1');
+insert into department_degree (department_id, degree_id) VALUES (2,'2');
+insert into department_degree (department_id, degree_id) VALUES (3,'3');
+insert into department_degree (department_id, degree_id) VALUES (1,'4');
+
+
+-----------------------------list above are correct----------------------------
+
+--TBD
+
+
+
+
+NAME:    Course-taken:          Cannot take:            Because of:
+Dave     CSE221-2 CSE255-3      PHIL12-4				CSE255-3
+Nelson   CSE221-9 CSE255-3      CSE8A-10 PHIL12-4		CSE221-9 CSE255-3
+Andrew   CSE221-5				PHIL12-4 CSE255-3		CSE221-5
+Nathan   CSE221-2				N/A
+John     CSE221-9				CSE8A-10				CSE221-9
+Anwell   CSE221-5				PHIL12-4 CSE255-3		CSE221-5
+Tim      CSE255-3				PHIL12-4				CSE255-3
+Benjamin CSE8A-10				N/A
+Julie    CSE8A-10				N/A
+Daniel   CSE8A-10				N/A
+Michael  MAE108-1				N/A
+Joseph   MAE108-1				N/A
+Devin    MAE108-8				PHIL165-7				MAE108-8
+Claire   CSE105-6				N/A
+Rachel   PHIL12-4				CSE255-3				PHIL12-4
+Zach     PHIL165-7				N/A
+Justin   PHIL12-4				CSE255-3				PHIL1204
+Rahul    PHIL165-7				N/A
+
+
+
+
+
+
+-------------------------------milestone 4------------------------------------------
+--milestone 4
+--4.1 session time conflction
+create or replace function handle_session_time_confliction() returns trigger as $body$
+    declare
+        section_time RECORD;
+    begin
+        for section_time in
+            select sd.session_date,sd.start_time
+            from weekly_section sd where sd.section_id = new.section_id
+        loop
+            if(
+                (section_time.session_date like '%M%' and new.session_date like '%M%' and section_time.start_time = new.start_time) or
+                (section_time.session_date like '%Tue%' and new.session_date like '%Tue%' and section_time.start_time = new.start_time) or
+                (section_time.session_date like '%W%' and new.session_date like '%W%' and section_time.start_time = new.start_time) or
+                (section_time.session_date like '%Thu%' and new.session_date like '%Thu%' and section_time.start_time = new.start_time) or
+                (section_time.session_date like '%F%' and new.session_date like '%F%' and section_time.start_time = new.start_time)
+                )
+            then
+                raise exception 'session time conflict exception';
+                exit ;
+            end if;
+        end loop;
+    return new;
+    end;
+
+
+    $body$ language plpgsql;
+
+create trigger handle_confliction
+    before insert or update on weekly_section
+    for each row
+    execute procedure handle_session_time_confliction();
+--test
+insert into weekly_section (session_type, session_date, start_time, session_place, mandatory, section_id)
+ select 'DI',24,start_time,session_place,mandatory,section_id from weekly_section where section_id = '5' and session_type = 'DI';
+
+select 'DI',session_date,start_time,session_place,mandatory,section_id from weekly_section where section_id = '5' and session_type = 'DI';
+
+delete from weekly_section where weekly_session_id > 38;
+
+
+--4.2 ENROLLMENT LIMIT
+create or replace function handle_enrollemnt_limit_func() returns trigger as $body$
+    begin
+        if((select count(student_id) as num_enrolled from enrollment where section_id = new.section_id) >=
+          (select s.enroll_number from section s where s.section_id = new.section_id) )
+        then
+            raise exception 'exceed_enrollemnt_limit_';
+
+        end if;
+        return new;
+    end;
+    $body$ language plpgsql;
+
+create trigger handle_enrollemnt_limit
+    before insert or update on enrollment
+    for each row
+    execute procedure handle_enrollemnt_limit_func();
+--test
+insert into enrollment (student_id, section_id, status, grade_option, unit) values (20,'10','Tes','Tes',4);
+delete from enrollment where status = 'Tes';
+select count(student_id) as num_enrolled from enrollment where section_id = '1';
+
+--4.3 Professor Time Confliction
+create or replace function handle_faculty_time_confliction_func() returns trigger as $body$
+    declare
+    faculty_time RECORD;
+    insert_session_time RECORD;
+    begin
+    <<here>>
+    FOR faculty_time IN
+        select distinct ws.session_date,ws.start_time
+        from faculty_section fs inner join weekly_section ws on fs.section_id = ws.section_id
+        where fs.name = new.name and ws.session_type = 'LE'
+    loop
+        FOR insert_session_time IN
+            select distinct session_date,start_time
+            from weekly_section where weekly_section.section_id = new.section_id and weekly_section.session_type = 'LE'
+        loop
+            if (
+                (faculty_time.session_date like '%M%' and insert_session_time.session_date like '%M%' and faculty_time.start_time = insert_session_time.start_time) or
+                (faculty_time.session_date like '%Tue%' and insert_session_time.session_date like '%Tue%' and faculty_time.start_time = insert_session_time.start_time) or
+                (faculty_time.session_date like '%W%' and insert_session_time.session_date like '%W%' and faculty_time.start_time = insert_session_time.start_time) or
+                (faculty_time.session_date like '%Thu%' and insert_session_time.session_date like '%Thu%' and faculty_time.start_time = insert_session_time.start_time) or
+                (faculty_time.session_date like '%F%' and insert_session_time.session_date like '%F%' and faculty_time.start_time = insert_session_time.start_time)
+                )
+            then
+                raise exception 'faculty time conflict exception';
+                exit here;
+            end if;
+        end loop;
+    end loop;
+    return new;
+
+    end;
+    $body$ language plpgsql;
+
+create trigger handle_faculty_time_confliction
+    before insert or update on faculty_section
+    for each row
+    execute procedure handle_faculty_time_confliction_func();
+
+--test
+insert into faculty_section (name, section_id) values ('Adele','10');
+delete from faculty_section where faculty_section_id > 32;
+
+
+
+
+-------------------------------milestone 5------------------------------------------
+--create table 3.a.2
+create table CPQG(
+    CPQG_id serial not null ,
+    course_name varchar not null ,
+    faculty_name varchar not null ,
+    quarter_id int not null ,
+    grade varchar not null ,
+    num_grade int not null ,
+    primary key (CPQG_id),
+    foreign key (course_name) references courses (course_name),
+    foreign key (faculty_name) references faculty (name),
+    foreign key (quarter_id) references quarter (quarter_id)
+
+);
+
+--build cpqg
+insert into cpqg (course_name, faculty_name, quarter_id, grade, num_grade)
+SELECT distinct qc.course_name,fs.name,qc.quarter_id,p.grade,count(p.grade)
+from passclass p inner join quarter_courses qc on p.course_name = qc.course_name
+inner join faculty_section fs on qc.section_id = fs.section_id
+group by  qc.course_name,fs.name,qc.quarter_id,p.grade
+order by fs.name,qc.course_name,qc.quarter_id;
+
+--Rebuild the decision support queries (3.a.2)
+select grade,num_grade from cpqg where course_name= ? and faculty_name= ? and quarter_id= ?
+
+-- build CPG
+--create table 3.a.2
+create table CPG(
+                     CPG_id serial not null ,
+                     course_name varchar not null ,
+                     faculty_name varchar not null ,
+                     grade varchar not null ,
+                     num_grade int not null ,
+                     primary key (CPG_id),
+                     foreign key (course_name) references courses (course_name),
+                     foreign key (faculty_name) references faculty (name)
+
+);
+
+insert into cpg (course_name, faculty_name, grade, num_grade)
+SELECT distinct qc.course_name,fs.name,p.grade,count(p.grade)
+from passclass p inner join quarter_courses qc on p.course_name = qc.course_name
+inner join faculty_section fs on qc.section_id = fs.section_id
+group by qc.course_name,fs.name,p.grade
+order by fs.name,qc.course_name;
+
+--Rebuild the decision support queries (3.a.3)
+select grade, num_grade from cpg where course_name = ? and  faculty_name = ?;
+
+
+--build trigger
+
+
+create or replace function auditfunc() returns trigger as $body$
+    begin
+        if (exists(select *
+        from passclass
+        where course_name = new.course_name and grade = new.grade and quarter_id = new.quarter_id))
+        then
+            update cpqg
+            set num_grade = num_grade + 1
+            where grade = new.grade and course_name = new.course_name and quarter_id = new.quarter_id and faculty_name in (
+                select distinct fs.name
+                from faculty_section fs inner join quarter_courses qc on fs.section_id = qc.section_id
+                where qc.quarter_id = new.quarter_id and qc.course_name = new.course_name
+                );
+        elsif (not exists(select *
+                          from passclass
+                          where course_name = new.course_name and grade = new.grade and quarter_id = new.quarter_id))
+        then
+            insert into cpqg (course_name, faculty_name, quarter_id, grade, num_grade) (select distinct new.course_name,fs3.name,new.quarter_id,new.grade,1
+            from faculty_section fs3 inner join quarter_courses c on fs3.section_id = c.section_id
+            where c.quarter_id = new.quarter_id and c.course_name = new.course_name);
+        end if;
+
+        if (exists(select *
+                   from passclass
+                   where course_name = new.course_name and grade = new.grade))
+        then
+            update cpg
+            set num_grade = num_grade + 1
+            where grade = new.grade and course_name = new.course_name and faculty_name in (
+                select fs.name
+                from faculty_section fs inner join quarter_courses q on fs.section_id = q.section_id
+                where q.course_name = new.course_name and q.quarter_id = new.quarter_id
+                );
+        elsif (not exists(select *
+                      from passclass
+                      where course_name = new.course_name and grade = new.grade))
+        then
+
+            insert into cpg (course_name, faculty_name, grade, num_grade) SELECT distinct new.course_name,fs2.name,new.grade,1
+            from faculty_section fs2 inner join quarter_courses qc2 on fs2.section_id = qc2.section_id
+            where qc2.course_name = new.course_name and qc2.quarter_id = new.quarter_id;
+        end if;
+        return new;
+    end;
+    $body$ language plpgsql;
+
+create trigger update_view
+    before insert on passclass
+    for each row
+execute procedure auditfunc();
+
+
